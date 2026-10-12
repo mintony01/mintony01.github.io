@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CINE MATCH | 특별관 추천</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,'Malgun Gothic',sans-serif}*{box-sizing:border-box}body{margin:0;background:#090c17;color:#f6f7fc}header{padding:22px max(20px,calc((100vw - 1050px)/2));border-bottom:1px solid #2c3247;display:flex;justify-content:space-between;align-items:center}.logo{font-weight:900;letter-spacing:2px;color:#a99aff}.tag{font-size:12px;color:#b4bad2}main{max-width:1050px;margin:auto;padding:55px 20px}h1{font-size:clamp(32px,5vw,56px);line-height:1.2;margin:0 0 15px}h1 span{color:#a99aff}.lead{color:#b9c0d7;margin-bottom:35px}.panel{background:#171c2e;border:1px solid #30364e;border-radius:20px;padding:24px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}label{display:block;font-size:13px;color:#b9c0d7;margin-bottom:8px}select,button{width:100%;padding:13px;border-radius:10px;font:inherit}select{background:#0e1424;border:1px solid #414963;color:white}button{background:#9d87ff;color:#100b24;border:0;font-weight:800;cursor:pointer;grid-column:1/-1}button:hover{background:#baaaff}.section{margin-top:42px}.section h2{font-size:23px}.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}.card{background:#171c2e;border:1px solid #343b56;border-radius:18px;padding:22px}.pill{display:inline-block;background:#30264d;color:#cbbaff;border-radius:99px;padding:5px 10px;font-size:12px}.score{font-size:28px;font-weight:900;color:#b5a5ff;float:right}.card h3{margin:18px 0 6px}.meta{color:#b9c0d7;font-size:14px;line-height:1.9}.reason{border-top:1px solid #353a51;margin-top:15px;padding-top:12px;font-size:13px;color:#ded8ff}.note{color:#aeb5ce;font-size:13px;line-height:1.7;margin-top:24px}footer{border-top:1px solid #292e41;padding:24px;text-align:center;color:#949bb5;font-size:12px}@media(max-width:600px){.panel{grid-template-columns:1fr}main{padding-top:40px}}
+</style>
+</head>
+<body>
+<header><div class="logo">✦ CINE MATCH AI</div><div class="tag">Sprint 1 · Demo</div></header>
+<main><h1>영화의 감동을 더 크게.<br><span>나에게 맞는 특별관 찾기.</span></h1><p class="lead">IMAX · ScreenX · 4DX 상영관을 조건별로 비교하고 관람 시간을 추천합니다.</p>
+<form id="search" class="panel"><div><label for="movie">영화</label><select id="movie"><option value="all">전체 영화</option><option value="우주 탐험">우주 탐험 (가상 영화)</option><option value="도시의 추격">도시의 추격 (가상 영화)</option></select></div><div><label for="region">지역</label><select id="region"><option value="all">전체 지역</option><option value="서울">서울</option><option value="경기">경기</option><option value="부산">부산</option></select></div><div><label for="format">특별관</label><select id="format"><option value="all">전체 특별관</option><option>IMAX</option><option>ScreenX</option><option>4DX</option></select></div><div><label for="time">선호 시간대</label><select id="time"><option value="all">전체 시간대</option><option value="day">낮 (12:00~17:59)</option><option value="night">저녁 (18:00 이후)</option></select></div><button type="submit">✨ 내 조건에 맞는 특별관 추천</button></form>
+<section class="section"><h2>추천 상영관 <small id="count" style="color:#aeb5ce;font-size:14px"></small></h2><div class="results" id="results" aria-live="polite"></div><p class="note">※ 영화 제목, 상영 회차, 잔여 좌석 수는 모두 시연용 가상 데이터입니다. 실제 예매 또는 좌석 확보가 되지 않습니다. 추천 점수는 필터 일치와 시간대 선호에 기반한 규칙형 점수이며, 생성형 AI가 아닙니다.</p></section>
+</main><footer>© 2026 CINE MATCH AI · GitHub Pages Sprint 1</footer>
+<script>
+const shows=[
+{movie:'우주 탐험',region:'서울',cinema:'용산 특별관 (시연)',format:'IMAX',time:'19:30',seats:42},
+{movie:'우주 탐험',region:'서울',cinema:'왕십리 특별관 (시연)',format:'ScreenX',time:'16:10',seats:27},
+{movie:'도시의 추격',region:'서울',cinema:'여의도 특별관 (시연)',format:'4DX',time:'20:20',seats:18},
+{movie:'우주 탐험',region:'경기',cinema:'수원 특별관 (시연)',format:'IMAX',time:'14:40',seats:55},
+{movie:'도시의 추격',region:'부산',cinema:'센텀 특별관 (시연)',format:'ScreenX',time:'18:50',seats:33},
+{movie:'도시의 추격',region:'경기',cinema:'판교 특별관 (시연)',format:'4DX',time:'15:20',seats:21}
+];
+const el=id=>document.getElementById(id);
+function render(){const movie=el('movie').value,region=el('region').value,format=el('format').value,time=el('time').value;const filtered=shows.filter(s=>(movie==='all'||s.movie===movie)&&(region==='all'||s.region===region)&&(format==='all'||s.format===format)&&(time==='all'||(time==='day'?Number(s.time.slice(0,2))>=12&&Number(s.time.slice(0,2))<18:Number(s.time.slice(0,2))>=18))).map(s=>({...s,score:Math.min(99,78+(s.seats>=30?8:3)+(Number(s.time.slice(0,2))>=18?7:4))})).sort((a,b)=>b.score-a.score);el('count').textContent=`${filtered.length}개 결과`;el('results').innerHTML=filtered.length?filtered.map(s=>`<article class="card"><span class="score">${s.score}점</span><span class="pill">${s.format}</span><h3>${s.cinema}</h3><div class="meta">🎬 ${s.movie}<br>📍 ${s.region}<br>🕒 ${s.time}<br>💺 잔여 ${s.seats}석 (가상)</div><div class="reason">✨ 추천 이유: 선택한 조건과 일치하는 회차이며 ${s.seats>=30?'가상 잔여 좌석이 비교적 넉넉합니다.':'가상 잔여 좌석이 제한적입니다.'}</div></article>`).join(''):'<p class="note">조건에 맞는 시연 데이터가 없습니다. 필터를 변경해 보세요.</p>'}
+el('search').addEventListener('submit',e=>{e.preventDefault();render()});render();
+</script>
+</body></html>
